@@ -1,11 +1,10 @@
 'use strict';
 
-var express = require('express');
-var authRoutes = require('../auth/routes');
+var showRoutes = require('../shows/routes');
 
 module.exports = {
   apply: function (server) {
-    server.use('/', authRoutes);
+    server.use('/', showRoutes);
 
     return server;
   }

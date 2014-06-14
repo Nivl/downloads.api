@@ -1,14 +1,11 @@
 'use strict';
 
 var express = require('express');
-var passport = require('passport');
 var mongoose = require('mongoose');
-var fs = require('fs');
+var http = require('http');
 
 var config = require('../../config').current;
 var routes = require('./routes');
-
-require('../auth/libs/auth');
 
 module.exports = {
   create: function (production) {
@@ -20,7 +17,6 @@ module.exports = {
     }
 
     var app = express();
-    app.use(passport.initialize());
     app.use(require('body-parser')());
     app.use(require('method-override')());
 
@@ -42,18 +38,6 @@ module.exports = {
       res.send({ error: err.message });
     });
 
-    if (config.useSSL) {
-      var https = require('https');
-      var credentials = {
-        key: fs.readFileSync('http/certificates/api.key', 'utf8'),
-        cert: fs.readFileSync('http/certificates/api.crt', 'utf8')
-      };
-
-      return https.createServer(credentials, app);
-    } else {
-      var http = require('http');
-
-      return http.createServer(app);
-    }
+    return http.createServer(app);
   }
 };

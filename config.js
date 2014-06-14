@@ -44,6 +44,8 @@ module.exports = {
     }
   },
 
+  current: null,
+
   init: function () {
     'use strict';
     this.current = this.dev;

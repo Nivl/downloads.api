@@ -21,4 +21,5 @@ app/config.js
 .directory
 TODO
 *.sublime-*
+.idea
 
