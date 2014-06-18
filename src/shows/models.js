@@ -12,7 +12,6 @@ var ShowSchema = new Schema({
   },
   downloadLink: {
     type: String,
-    required: true,
     trim: true
   },
   wikipedia: {
@@ -21,10 +20,10 @@ var ShowSchema = new Schema({
     trim: true
   },
   day: {
-    type: String,
-    required: true,
-    enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-    trim: true
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 6
   },
   returnDate: {
     type: String
@@ -43,7 +42,7 @@ var ShowSchema = new Schema({
 });
 
 ShowSchema.pre('save', function (next) {
-  if (this.downloadLink.substr(0, 4) !== 'http') {
+  if (this.downloadLink &&  this.downloadLink.substr(0, 4) !== 'http') {
     this.downloadLink = 'https://' + this.downloadLink;
   }
 
