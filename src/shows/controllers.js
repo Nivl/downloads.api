@@ -50,14 +50,7 @@ module.exports = {
   },
 
   addShow: function (req, res) {
-    var show = new Show();
-    show.title = req.body.title;
-    show.downloadLink = req.body.downloadLink;
-    show.wikipedia = req.body.wikipedia;
-    show.returnDate = req.body.returnDate;
-    show.isCompleted = req.body.isCompleted;
-    show.isCancelled = req.body.isCancelled;
-    show.markedForDeletionDate = req.body.markedForDeletionDate;
+    var show = new Show(req.body.formData);
 
     show.save(function (err) {
       if (err) {
