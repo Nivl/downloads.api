@@ -21,9 +21,9 @@ var ShowSchema = new Schema({
   },
   day: {
     type: Number,
-    default: 0,
-    min: 0,
-    max: 6
+    default: 1,
+    min: 1,
+    max: 7
   },
   returnDate: {
     type: String

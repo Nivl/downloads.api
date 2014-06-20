@@ -20,7 +20,7 @@ module.exports = {
   },
 
   getLatestAired: function (req, res) {
-    var yesterday = tz.subtract('days', 1).format('dddd').toLowerCase();
+    var yesterday = tz.subtract('days', 1).isoWeekday();
 
     Show.find({day: yesterday}, function (err, users) {
       if (err) {
