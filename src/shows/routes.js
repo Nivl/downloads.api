@@ -14,5 +14,6 @@ var router = express.Router();
 router.get(baseUrl, controllers.getAll);
 router.post(baseUrl, controllers.addShow);
 router.put(baseUrl + ':id/', controllers.updateShow);
+router.delete(baseUrl + ':id/', controllers.removeShow);
 
 module.exports = router;

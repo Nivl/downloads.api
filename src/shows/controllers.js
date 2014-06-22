@@ -41,6 +41,23 @@ module.exports = {
         res.send(200);
       }
     });
-  }
+  },
 
+  removeShow: function (req, res) {
+    var id = req.params.id;
+
+    Show.findById(id, function (err, show) {
+      if (err) {
+        res.send(500);
+      } else {
+        show.remove(function (err) {
+          if (err) {
+            res.send(500);
+          } else {
+            res.send(200);
+          }
+        });
+      }
+    });
+  }
 };
