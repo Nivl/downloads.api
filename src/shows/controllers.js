@@ -15,7 +15,7 @@ module.exports = {
   },
 
   addShow: function (req, res) {
-    var show = new Show(req.body.formData);
+    var show = new Show(req.body);
 
     show.save(function (err) {
       if (err) {
