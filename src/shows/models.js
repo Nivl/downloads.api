@@ -34,9 +34,6 @@ var ShowSchema = new Schema({
   isCancelled: {
     type: Boolean,
     default: false
-  },
-  markedForDeletionDate: {
-    type: Date
   }
 });
 
