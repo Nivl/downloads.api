@@ -3,7 +3,6 @@
 var mongoose = new require('mongoose');
 var Schema = mongoose.Schema;
 
-
 var ShowSchema = new Schema({
   title: {
     type: String,
@@ -40,6 +39,8 @@ var ShowSchema = new Schema({
     type: Date
   }
 });
+
+ShowSchema.plugin(require('mongoose-merge-plugin'));
 
 ShowSchema.pre('save', function (next) {
   if (this.downloadLink &&  this.downloadLink.substr(0, 4) !== 'http') {
