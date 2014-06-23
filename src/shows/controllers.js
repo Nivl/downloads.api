@@ -29,16 +29,19 @@ module.exports = {
   updateShow: function (req, res) {
     var id = req.params.id;
 
-    // TODO: might be useless
-    if (req.body.formData && req.body.formData.day) {
-      req.body.formData.day = parseInt(req.body.formData.day);
-    }
-
-    Show.update({_id: id}, {$set: req.body.formData}, function (err) {
+    Show.findById(id, function (err, show) {
       if (err) {
-        res.send(400, err);
+        res.send(400);
       } else {
-        res.send(200);
+        show.merge(req.body);
+
+        show.save(function (err) {
+          if (err) {
+            res.send(400, err);
+          } else {
+            res.send(200, show);
+          }
+        });
       }
     });
   },
