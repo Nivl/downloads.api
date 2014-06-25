@@ -9,6 +9,19 @@ var ShowSchema = new Schema({
     required: true,
     trim: true
   },
+  ids: {
+    tmdbId: { type: Number },
+    tvrageId: { type: Number },
+    imdbId: { type: String }
+  },
+  synopsis: {
+    type: String,
+    trim: true
+  },
+  poster: {
+    type: String,
+    trim: true
+  },
   downloadLink: {
     type: String,
     trim: true
@@ -24,8 +37,13 @@ var ShowSchema = new Schema({
     min: 1,
     max: 7
   },
-  returnDate: {
-    type: String
+  nextEpisode : {
+    title: { type: String },
+    date: { type: String }
+  },
+  latestEpisode : {
+    title: { type: String },
+    date: { type: String }
   },
   isCompleted: {
     type: Boolean,

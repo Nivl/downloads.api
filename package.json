@@ -13,7 +13,13 @@
     "method-override": "^1.0.0",
     "mongoose": "~3.8.8",
     "mongoose-merge-plugin": "0.0.4",
-    "mongoose-validate": "0.0.5"
+    "mongoose-validate": "0.0.5",
+    "node-tvdb": "^0.2.8",
+    "request": "^2.36.0",
+    "tvragejson": "^0.1.3",
+    "underscore": "^1.6.0",
+    "winston": "^0.7.3",
+    "xml2js": "^0.4.4"
   },
   "devDependencies": {
     "grunt": "~0.4.4",
