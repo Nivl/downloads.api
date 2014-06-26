@@ -17,6 +17,7 @@ router.put(baseUrl + ':id/', controllers.updateShow);
 router.delete(baseUrl + ':id/', controllers.removeShow);
 
 
-router.post(baseUrl + 'fetch-info/', controllers.fetchInfo);
+router.post(baseUrl + 'fetch/tvdb/', controllers.fetchTvDb);
+router.post(baseUrl + 'fetch/tvrage/', controllers.fetchTvRage);
 
 module.exports = router;

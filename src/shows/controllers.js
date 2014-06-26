@@ -8,31 +8,6 @@ var TVRage = require('tvragejson');
 var log = require('../api/log')(module);
 var Show = require('./models').Show;
 
-function waitCallbacks(nbCallbacks, res, data) {
-  if (nbCallbacks === 0) {
-    res.send(200, data);
-  }
-}
-
-function getTvDbInfo(imdbId, callback) {
-  var tbDbUrl = 'http://thetvdb.com/api/GetSeriesByRemoteID.php?imdbid=' + imdbId;
-  request(tbDbUrl, function(error, response, body) {
-    if (error) {
-      log.error('TVDB error:', error);
-    } else {
-      var parser = new xml2js.Parser({explicitArray: false});
-
-      parser.parseString(body, function (err, result) {
-        if (err) {
-          log.error('TVDB error:', err);
-        } else {
-          callback({synopsis: result.Data.Series.Overview});
-        }
-      });
-    }
-  });
-}
-
 function getTvRageInfo(tvRageId, callback) {
   var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?sid=' + tvRageId + '&exact=1';
 
@@ -131,41 +106,67 @@ module.exports = {
     });
   },
 
-  fetchInfo: function (req, res) {
+  fetchTvDb: function (req, res) {
     if (req.body.ids) {
       var imdbId = req.body.ids.imdbId;
-      var tvRageId = req.body.ids.tvrageId;
-      var callbacks = 0;
-      var out = {};
-
-      callbacks += 1;
-      if (tvRageId && tvRageId > 0) {
-        getTvRageInfo(tvRageId, function (data) {
-          callbacks -= 1;
-          out = _.extend(data, out);
-          waitCallbacks(callbacks, res, out);
-        });
-      } else {
-        // TODO: Return the id to the webapp
-        TVRage.search(req.body.title, function(response) {
-          getTvRageInfo(response.Results.show[0].showid, function (data) {
-            callbacks -= 1;
-            out = _.extend(data, out);
-            waitCallbacks(callbacks, res, out);
-          });
-        });
-      }
 
       if (imdbId && imdbId.length > 0) {
-        callbacks += 1;
-        getTvDbInfo(imdbId, function (data) {
-          callbacks -= 1;
-          out = _.extend(data, out);
-          waitCallbacks(callbacks, res, out);
+        var tbDbUrl = 'http://thetvdb.com/api/GetSeriesByRemoteID.php?imdbid=' + imdbId;
+
+        request(tbDbUrl, function (error, response, body) {
+          if (error) {
+            log.error('TVDB error:', error);
+            res.send(400, {});
+          } else {
+            var parser = new xml2js.Parser({explicitArray: false});
+
+            parser.parseString(body, function (err, result) {
+              if (err) {
+                log.error('TVDB error:', err);
+                res.send(400, {});
+              } else {
+                res.send(200, result.Data.Series);
+              }
+            });
+          }
         });
+      } else {
+        res.send(400, {});
+      }
+    } else {
+      res.send(400, {});
+    }
+  },
+
+  fetchTvRage: function (req, res) {
+    if (req.body.ids) {
+      var tvRageId = req.body.ids.tvrageId;
+
+      if (tvRageId) {
+        getTvRageInfo(tvRageId, function (data) {
+          var code = (_.isEmpty(data)) ? (400) : (200);
+          res.send(code, data);
+        });
+      } else if (req.body.title || req.body.alternateTitle) {
+        var title = req.body.alternateTitle || req.body.title;
+
+        TVRage.search(title, function(response) {
+          getTvRageInfo(response.Results.show[0].showid, function (data) {
+            if (_.isEmpty(data)) {
+              res.send(400, data);
+            } else {
+              data.id = response.Results.show[0].showid;
+              res.send(200, data);
+            }
+          });
+        });
+      } else {
+        res.send(400, {});
       }
     } else {
       res.send(400, {});
     }
   }
 };
+
+
