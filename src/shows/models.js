@@ -26,11 +26,6 @@ var ShowSchema = new Schema({
     type: String,
     trim: true
   },
-  wikipedia: {
-    type: String,
-    required: true,
-    trim: true
-  },
   day: {
     type: Number,
     default: 1,
@@ -60,10 +55,6 @@ ShowSchema.plugin(require('mongoose-merge-plugin'));
 ShowSchema.pre('save', function (next) {
   if (this.downloadLink &&  this.downloadLink.substr(0, 4) !== 'http') {
     this.downloadLink = 'https://' + this.downloadLink;
-  }
-
-  if (this.wikipedia.substr(0, 4) !== 'http') {
-    this.wikipedia = 'https://' + this.wikipedia;
   }
 
   next();
