@@ -1,4 +1,5 @@
 'use strict';
+require('datejs');
 
 var mongoose = new require('mongoose');
 var Schema = mongoose.Schema;
@@ -53,8 +54,26 @@ var ShowSchema = new Schema({
 ShowSchema.plugin(require('mongoose-merge-plugin'));
 
 ShowSchema.pre('save', function (next) {
+  var parsedDate = null;
+
   if (this.downloadLink &&  this.downloadLink.substr(0, 4) !== 'http') {
     this.downloadLink = 'https://' + this.downloadLink;
+  }
+
+  if (this.nextEpisode && this.nextEpisode.date && this.nextEpisode.date.length > 0) {
+    parsedDate = Date.parse(this.nextEpisode.date).getTime();
+
+    if (parsedDate) {
+      this.nextEpisode.date = parsedDate;
+    }
+  }
+
+  if (this.latestEpisode && this.latestEpisode.date && this.latestEpisode.date.length > 0) {
+    parsedDate = Date.parse(this.latestEpisode.date).getTime();
+
+    if (parsedDate) {
+      this.latestEpisode.date = parsedDate;
+    }
   }
 
   next();
