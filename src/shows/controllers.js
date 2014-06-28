@@ -11,9 +11,7 @@ var Show = require('./models').Show;
 function getTvRageInfo(tvRageId, callback) {
   var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?sid=' + tvRageId + '&exact=1';
 
-  console.log('TV Rage start');
   request(tvRageUrl, function(error, response, body) {
-    console.log('TV Rage responded');
     var out = {};
 
     if (error) {
@@ -60,7 +58,6 @@ module.exports = {
 
     show.save(function (err) {
       if (err) {
-        console.log(err);
         res.send(400, err);
       } else {
         res.send(201, show);
