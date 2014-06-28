@@ -147,16 +147,23 @@ module.exports = {
       } else if (req.body.title || req.body.alternateTitle) {
         var title = req.body.alternateTitle || req.body.title;
 
-        TVRage.search(title, function(response) {
-          getTvRageInfo(response.Results.show[0].showid, function (data) {
-            if (_.isEmpty(data)) {
-              res.send(400, data);
-            } else {
-              data.id = response.Results.show[0].showid;
-              res.send(200, data);
-            }
+        try {
+          TVRage.search(title, function (response) {
+            var showId = response.Results.show[0].showid[0];
+
+            getTvRageInfo(showId, function (data) {
+              if (_.isEmpty(data)) {
+                res.send(400, data);
+              } else {
+                data.id = showId;
+                res.send(200, data);
+              }
+            });
           });
-        });
+        } catch (e) {
+          log.error('TV Rage error:', e);
+          res.send(400, {});
+        }
       } else {
         res.send(400, {});
       }
