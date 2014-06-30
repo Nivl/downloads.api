@@ -11,9 +11,9 @@ var ShowSchema = new Schema({
     trim: true
   },
   ids: {
-    tmdbId: { type: Number },
-    tvrageId: { type: Number },
-    imdbId: { type: String }
+    tmdbId: { type: Number }, //todo tmdb
+    tvrageId: { type: Number }, //todo tvrage
+    imdbId: { type: String } //todo imdb
   },
   synopsis: {
     type: String,
@@ -41,11 +41,11 @@ var ShowSchema = new Schema({
     title: { type: String },
     date: { type: String }
   },
-  isCompleted: {
+  isCompleted: { //todo isComplete
     type: Boolean,
     default: false
   },
-  isCancelled: {
+  isCancelled: { //todo hasBeenCanceled
     type: Boolean,
     default: false
   }

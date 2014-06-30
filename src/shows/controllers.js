@@ -4,9 +4,16 @@ var request = require('request');
 var _ = require('underscore');
 var xml2js = require('xml2js');
 var TVRage = require('tvragejson');
+var schedule = require('node-schedule');
 
 var log = require('../api/log')(module);
 var Show = require('./models').Show;
+
+function findWeekIndex(name) {
+  var week = {Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 7};
+  return week[name];
+
+}
 
 function getTvRageInfo(tvRageId, callback) {
   var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?sid=' + tvRageId + '&exact=1';
@@ -41,6 +48,58 @@ function getTvRageInfo(tvRageId, callback) {
     callback(out);
   });
 }
+
+function updateShowFromTvRage(show) {
+  getTvRageInfo(show.ids.tvrageId, function (data) {
+    if (_.isEmpty(data)) {
+      log.error('Fail to retreive ' + show.title + ':', 'Empty data');
+    } else {
+      if (data.Status) {
+        if (data.Status === 'Ended') {
+          show.isCompleted = true;
+        } else if (data.Status === 'Canceled') {
+          show.isCancelled = true;
+        }
+      }
+
+      if (data.Airtime) {
+        var info = data.Airtime.split(' at ');
+        show.day = findWeekIndex(info[0]);
+      }
+
+      if (data['Next Episode'] && data['Next Episode'][2]) {
+        show.nextEpisode = {'title': data['Next Episode'][1], date: data['Next Episode'][2]};
+      }
+
+      if (data['Latest Episode'] && data['Latest Episode'][2]) {
+        show.latestEpisode = {'title': data['Latest Episode'][1], date: data['Latest Episode'][2]};
+      }
+
+      show.save(function (err) {
+        if (err) {
+          log.error('Fail to update ' + show.title + ':', err);
+        }
+      });
+    }
+  });
+}
+
+schedule.scheduleJob('30 0 * * *', function() {
+  Show.find({}, function (err, shows) {
+    if (err) {
+      log.error('Cron failed:', err);
+    } else {
+      var nbShow = shows.length;
+
+      for (var i = 0; i < nbShow; i += 1) {
+        var show = shows[i];
+
+        updateShowFromTvRage(show);
+      }
+    }
+  });
+});
+
 
 module.exports = {
   getAll: function (req, res) {
@@ -146,24 +205,18 @@ module.exports = {
         });
       } else if (req.body.title || req.body.alternateTitle) {
         var title = req.body.alternateTitle || req.body.title;
+        TVRage.search(title, function (response) {
+          var showId = response.Results.show[0].showid[0];
 
-        try {
-          TVRage.search(title, function (response) {
-            var showId = response.Results.show[0].showid[0];
-
-            getTvRageInfo(showId, function (data) {
-              if (_.isEmpty(data)) {
-                res.send(400, data);
-              } else {
-                data.id = showId;
-                res.send(200, data);
-              }
-            });
+          getTvRageInfo(showId, function (data) {
+            if (_.isEmpty(data)) {
+              res.send(400, data);
+            } else {
+              data.id = showId;
+              res.send(200, data);
+            }
           });
-        } catch (e) {
-          log.error('TV Rage error:', e);
-          res.send(400, {});
-        }
+        });
       } else {
         res.send(400, {});
       }
