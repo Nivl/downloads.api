@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO use the format (date: message) for the logs
+
 var request = require('request');
 var _ = require('underscore');
 var xml2js = require('xml2js');
@@ -205,17 +207,21 @@ module.exports = {
         });
       } else if (req.body.title || req.body.alternateTitle) {
         var title = req.body.alternateTitle || req.body.title;
-        TVRage.search(title, function (response) {
-          var showId = response.Results.show[0].showid[0];
+        TVRage.search(title, function (err, response) {
+          if (err) {
+            res.send(400, {});
+          } else {
+            var showId = response.Results.show[0].showid[0];
 
-          getTvRageInfo(showId, function (data) {
-            if (_.isEmpty(data)) {
-              res.send(400, data);
-            } else {
-              data.id = showId;
-              res.send(200, data);
-            }
-          });
+            getTvRageInfo(showId, function (data) {
+              if (_.isEmpty(data)) {
+                res.send(400, data);
+              } else {
+                data.id = showId;
+                res.send(200, data);
+              }
+            });
+          }
         });
       } else {
         res.send(400, {});
