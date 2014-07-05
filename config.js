@@ -9,7 +9,7 @@ module.exports = {
       'tokenLife' : 3600
     },
     db: {
-      mongo: 'mongodb://localhost/download',
+      mongo: process.env.MONGOHQ_URL || 'mongodb://localhost/download',
       mongoTest: 'mongodb://localhost/download-test',
     }
   },

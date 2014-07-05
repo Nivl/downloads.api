@@ -36,7 +36,7 @@ module.exports = function (grunt) {
           nodeArgs: ['--debug'],
           env: {
             PORT: projectConfig.http.port
-          },
+          }
         }
       }
     },
@@ -64,7 +64,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', function () {
     grunt.task.run([
-      'mochaTest',
+      'mochaTest'
     ]);
   });
 
