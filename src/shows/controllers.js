@@ -3,18 +3,19 @@
 // TODO use the format (date: message) for the logs
 
 var request = require('request');
-var _ = require('underscore');
+var _ = require('underscore'); // todo replace by lodash
 var xml2js = require('xml2js');
 var TVRage = require('tvragejson');
 var schedule = require('node-schedule');
+var uuid = require('node-uuid');
 
+var io = require('../api/sockets');
 var log = require('../api/log')(module);
 var Show = require('./models').Show;
 
 function findWeekIndex(name) {
   var week = {Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 7};
   return week[name];
-
 }
 
 function getTvRageInfo(tvRageId, callback) {
@@ -51,9 +52,10 @@ function getTvRageInfo(tvRageId, callback) {
   });
 }
 
-function updateShowFromTvRage(show) {
+function updateShowFromTvRage(show, callbackObj) {
   getTvRageInfo(show.ids.tvrageId, function (data) {
     if (_.isEmpty(data)) {
+      callbackObj.done();
       log.error('Fail to retreive ' + show.title + ':', 'Empty data');
     } else {
       if (data.Status) {
@@ -81,27 +83,40 @@ function updateShowFromTvRage(show) {
         if (err) {
           log.error('Fail to update ' + show.title + ':', err);
         }
+        callbackObj.done();
       });
     }
   });
 }
 
-schedule.scheduleJob('30 0 * * *', function() {
+schedule.scheduleJob('30 * * * *', function () {
+  var id = uuid.v4();
+  io.emitAllAndNew('maintenance', true, id);
+
   Show.find({}, function (err, shows) {
     if (err) {
       log.error('Cron failed:', err);
     } else {
       var nbShow = shows.length;
 
-      for (var i = 0; i < nbShow; i += 1) {
-        var show = shows[i];
+      var callbackObj = {
+        nb: nbShow,
+        done: function () {
+          this.nb -= 1;
 
-        updateShowFromTvRage(show);
+          if (this.nb === 0) {
+            io.stopEmitting(id);
+            io.emitToAll('maintenance', false);
+          }
+        }
+      };
+
+      for (var i = 0; i < nbShow; i += 1) {
+        updateShowFromTvRage(shows[i], callbackObj);
       }
     }
   });
 });
-
 
 module.exports = {
   getAll: function (req, res) {
@@ -121,6 +136,7 @@ module.exports = {
       if (err) {
         res.send(400, err);
       } else {
+        io.emitAll('addShow', show);
         res.send(201, show);
       }
     });
@@ -139,6 +155,7 @@ module.exports = {
           if (err) {
             res.send(400, err);
           } else {
+            io.emitAll('UpdateShow', show);
             res.send(200, show);
           }
         });
@@ -150,6 +167,11 @@ module.exports = {
     var id = req.params.id;
 
     Show.findById(id, function (err, show) {
+      var showData = {
+        id: id,
+        day: show.day
+      };
+
       if (err) {
         res.send(500);
       } else {
@@ -157,6 +179,7 @@ module.exports = {
           if (err) {
             res.send(500);
           } else {
+            io.emitAll('removeShow', showData);
             res.send(200);
           }
         });

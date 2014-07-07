@@ -4,6 +4,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var http = require('http');
 
+var io = require('./sockets');
 var config = require('../../config').current;
 var routes = require('./routes');
 
@@ -39,6 +40,9 @@ module.exports = {
       res.send({ error: err.message });
     });
 
-    return http.createServer(app);
+    var server = http.createServer(app);
+    io.listen(server);
+
+    return server;
   }
 };
