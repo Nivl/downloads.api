@@ -89,7 +89,7 @@ function updateShowFromTvRage(show, callbackObj) {
   });
 }
 
-schedule.scheduleJob('30 * * * *', function () {
+schedule.scheduleJob('30 */2 * * *', function () {
   var id = uuid.v4();
   io.emitAllAndNew('maintenance', true, id);
 
