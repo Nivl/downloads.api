@@ -20,7 +20,7 @@
     "node-uuid": "^1.4.1",
     "request": "^2.36.0",
     "socket.io": "^1.0.6",
-    "tvragejson": "^0.1.3",
+    "tvragejson": "^0.2.0",
     "underscore": "^1.6.0",
     "winston": "^0.7.3",
     "xml2js": "^0.4.4"
