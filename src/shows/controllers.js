@@ -56,7 +56,7 @@ function updateShowFromTvRage(show, callbackObj) {
   getTvRageInfo(show.ids.tvrageId, function (data) {
     if (_.isEmpty(data)) {
       callbackObj.done();
-      log.error('Fail to retreive ' + show.title + ':', 'Empty data');
+      log.error('Fail to retrieve ' + show.title + ':', 'Empty data');
     } else {
       if (data.Status) {
         if (data.Status === 'Ended') {
@@ -136,7 +136,7 @@ module.exports = {
       if (err) {
         res.send(400, err);
       } else {
-        io.emitAll('addShow', show);
+        io.emitToAll('addShow', show);
         res.send(201, show);
       }
     });
@@ -155,7 +155,7 @@ module.exports = {
           if (err) {
             res.send(400, err);
           } else {
-            io.emitAll('UpdateShow', show);
+            io.emitToAll('UpdateShow', show);
             res.send(200, show);
           }
         });
@@ -179,7 +179,7 @@ module.exports = {
           if (err) {
             res.send(500);
           } else {
-            io.emitAll('removeShow', showData);
+            io.emitToAll('removeShow', showData);
             res.send(200);
           }
         });
@@ -233,6 +233,7 @@ module.exports = {
         TVRage.search(title, function (err, response) {
           if (err) {
             res.send(400, {});
+            log.error('fail');
           } else {
             var showId = response.Results.show[0].showid[0];
 
