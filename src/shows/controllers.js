@@ -129,6 +129,7 @@ module.exports = {
     });
   },
 
+  // Todo avoid duplicate show
   addShow: function (req, res) {
     var show = new Show(req.body);
 
@@ -155,7 +156,7 @@ module.exports = {
           if (err) {
             res.send(400, err);
           } else {
-            io.emitToAll('UpdateShow', show);
+            io.emitToAll('updateShow', show);
             res.send(200, show);
           }
         });
@@ -174,7 +175,7 @@ module.exports = {
           id: id,
           day: show.day
         };
-        
+
         show.remove(function (err) {
           if (err) {
             res.send(500);
