@@ -167,14 +167,14 @@ module.exports = {
     var id = req.params.id;
 
     Show.findById(id, function (err, show) {
-      var showData = {
-        id: id,
-        day: show.day
-      };
-
       if (err) {
         res.send(500);
       } else {
+        var showData = {
+          id: id,
+          day: show.day
+        };
+        
         show.remove(function (err) {
           if (err) {
             res.send(500);
