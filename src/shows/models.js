@@ -2,7 +2,7 @@
 
 require('datejs');
 var mongoose = new require('mongoose');
-var moment = require('moment-timezone');
+//var moment = require('moment-timezone');
 var Schema = mongoose.Schema;
 
 var ShowSchema = new Schema({
