@@ -150,12 +150,9 @@ module.exports = {
       if (err) {
         res.send(400);
       } else {
-        console.log('BODY');
         console.log(req.body);
-        console.log('SHOW');
         console.log(show);
         show.merge(req.body);
-        console.log('NEW SHOW');
         console.log(show);
 
         show.save(function (err) {
