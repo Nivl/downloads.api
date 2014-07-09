@@ -62,7 +62,7 @@ ShowSchema.pre('save', function (next) {
   }
 
   if (this.nextEpisode && this.nextEpisode.date && this.nextEpisode.date.length > 0) {
-    parsedDate = Date.parse(this.nextEpisode.date);
+    parsedDate = Date.parse(this.nextEpisode.date).getTime();
 
     if (parsedDate) {
       this.nextEpisode.date = parsedDate; //moment.tz(parsedDate, 'America/Los_Angeles').valueOf();
@@ -71,7 +71,7 @@ ShowSchema.pre('save', function (next) {
 
   if (this.latestEpisode && this.latestEpisode.date && this.latestEpisode.date.length > 0) {
     console.log('Input: ' + this.nextEpisode.date);
-    parsedDate = Date.parse(this.latestEpisode.date).getTime();
+    parsedDate = Date.parse(this.latestEpisode.date);
 
     console.log('date.parse: ' + this.nextEpisode.date);
     console.log(': ' + this.nextEpisode.date);
