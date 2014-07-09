@@ -1,7 +1,8 @@
 'use strict';
-require('datejs');
 
+require('datejs');
 var mongoose = new require('mongoose');
+var moment = require('moment-timezone');
 var Schema = mongoose.Schema;
 
 var ShowSchema = new Schema({
@@ -64,7 +65,7 @@ ShowSchema.pre('save', function (next) {
     parsedDate = Date.parse(this.nextEpisode.date).getTime();
 
     if (parsedDate) {
-      this.nextEpisode.date = parsedDate;
+      this.nextEpisode.date = parsedDate; //moment.tz(parsedDate, 'America/Los_Angeles').valueOf();
     }
   }
 
@@ -72,9 +73,13 @@ ShowSchema.pre('save', function (next) {
     parsedDate = Date.parse(this.latestEpisode.date).getTime();
 
     if (parsedDate) {
-      this.latestEpisode.date = parsedDate;
+      this.latestEpisode.date = parsedDate; //moment.tz(parsedDate, 'America/Los_Angeles').valueOf();
     }
   }
+
+  console.log('DEBUG MODELS');
+  console.log(this.nextEpisode.date);
+  console.log(this.latestEpisode.date);
 
   next();
 });
