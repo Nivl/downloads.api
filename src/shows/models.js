@@ -57,6 +57,11 @@ ShowSchema.plugin(require('mongoose-merge-plugin'));
 ShowSchema.pre('save', function (next) {
   var parsedDate = null;
 
+  console.log('DEBUG MODELS [BEGIN]');
+
+  console.log('Next' + this.nextEpisode.date);
+  console.log('Latest' + this.latestEpisode.date);
+
   if (this.downloadLink &&  this.downloadLink.substr(0, 4) !== 'http') {
     this.downloadLink = 'https://' + this.downloadLink;
   }
@@ -77,9 +82,9 @@ ShowSchema.pre('save', function (next) {
     }
   }
 
-  console.log('DEBUG MODELS');
-  console.log(this.nextEpisode.date);
-  console.log(this.latestEpisode.date);
+  console.log('DEBUG MODELS [END]');
+  console.log('Next' + this.nextEpisode.date);
+  console.log('Latest' + this.latestEpisode.date);
 
   next();
 });
