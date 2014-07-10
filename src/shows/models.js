@@ -2,7 +2,7 @@
 
 require('datejs');
 var mongoose = new require('mongoose');
-//var moment = require('moment-timezone');
+var moment = require('moment-timezone');
 var Schema = mongoose.Schema;
 
 var ShowSchema = new Schema({
@@ -56,6 +56,9 @@ ShowSchema.plugin(require('mongoose-merge-plugin'));
 
 ShowSchema.pre('save', function (next) {
   var parsedDate = null;
+  var isoDate = null;
+  var zone = null;
+  var delta = 0;
 
   if (this.downloadLink &&  this.downloadLink.substr(0, 4) !== 'http') {
     this.downloadLink = 'https://' + this.downloadLink;
@@ -72,12 +75,17 @@ ShowSchema.pre('save', function (next) {
   if (this.latestEpisode && this.latestEpisode.date && this.latestEpisode.date.length > 0) {
     console.log('Input: ' + this.nextEpisode.date);
     parsedDate = Date.parse(this.latestEpisode.date);
+    isoDate = parsedDate.toISOString().replace(/\"/g, '');
+    zone = moment(isoDate).zone() / 60;
 
-    console.log('date.parse: ' + this.nextEpisode.date);
-    console.log(': ' + this.nextEpisode.date);
-    console.log('getTimezoneOffset: ' + this.nextEpisode.date.getTimezoneOffset());
+    console.log('IsoDate: ' + isoDate);
+    console.log('Zone: ' + zone);
+
     parsedDate = parsedDate.getTime();
-    console.log('Output: ' + this.nextEpisode.date);
+    console.log('Original Timezone: ' + parsedDate);
+    delta = 3600 * (7 - zone);
+    parsedDate += Math.pow(delta, 1000);
+    console.log('New Timezone: ' + parsedDate);
 
     if (parsedDate) {
       this.latestEpisode.date = parsedDate; //moment.tz(parsedDate, 'America/Los_Angeles').valueOf();

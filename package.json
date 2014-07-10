@@ -12,6 +12,7 @@
     "datejs": "^1.0.0-rc1",
     "express": "^4.1.1",
     "method-override": "^1.0.0",
+    "moment-timezone": "^0.1.0",
     "mongoose": "~3.8.8",
     "mongoose-merge-plugin": "0.0.4",
     "mongoose-validate": "0.0.5",
