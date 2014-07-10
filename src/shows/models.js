@@ -65,30 +65,28 @@ ShowSchema.pre('save', function (next) {
   }
 
   if (this.nextEpisode && this.nextEpisode.date && this.nextEpisode.date.length > 0) {
-    parsedDate = Date.parse(this.nextEpisode.date).getTime();
+    parsedDate = Date.parse(this.nextEpisode.date);
+    isoDate = parsedDate.toISOString().replace(/\"/g, '');
+    zone = moment(isoDate).zone() / 60;
+    parsedDate = parsedDate.getTime();
+    delta = 3600 * (7 - zone);
+    parsedDate += delta * 1000;
 
     if (parsedDate) {
-      this.nextEpisode.date = parsedDate; //moment.tz(parsedDate, 'America/Los_Angeles').valueOf();
+      this.nextEpisode.date = parsedDate;
     }
   }
 
   if (this.latestEpisode && this.latestEpisode.date && this.latestEpisode.date.length > 0) {
-    console.log('Input: ' + this.nextEpisode.date);
     parsedDate = Date.parse(this.latestEpisode.date);
     isoDate = parsedDate.toISOString().replace(/\"/g, '');
     zone = moment(isoDate).zone() / 60;
-
-    console.log('IsoDate: ' + isoDate);
-    console.log('Zone: ' + zone);
-
     parsedDate = parsedDate.getTime();
-    console.log('Original Timezone: ' + parsedDate);
     delta = 3600 * (7 - zone);
     parsedDate += delta * 1000;
-    console.log('New Timezone: ' + parsedDate);
 
     if (parsedDate) {
-      this.latestEpisode.date = parsedDate; //moment.tz(parsedDate, 'America/Los_Angeles').valueOf();
+      this.latestEpisode.date = parsedDate;
     }
   }
 
