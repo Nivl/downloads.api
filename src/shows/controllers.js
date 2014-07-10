@@ -5,7 +5,6 @@
 var request = require('request');
 var _ = require('underscore'); // todo replace by lodash
 var xml2js = require('xml2js');
-var TVRage = require('tvragejson');
 var schedule = require('node-schedule');
 var uuid = require('node-uuid');
 
@@ -19,7 +18,8 @@ function findWeekIndex(name) {
 }
 
 function getTvRageInfo(tvRageId, callback) {
-  var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?sid=' + tvRageId + '&exact=1';
+  var type = (typeof tvRageId === 'string') ? 'show' : 'sid';
+  var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?' + type + '=' + tvRageId + '&exact=1';
 
   request(tvRageUrl, function(error, response, body) {
     var out = {};
@@ -28,10 +28,14 @@ function getTvRageInfo(tvRageId, callback) {
       log.error('TV Rage error:', error);
     } else {
       var list = body.split('\n');
-      list.splice(0, 1);
+      //list.splice(0, 1);
       var nbElement = list.length;
 
       for (var i = 0; i < nbElement; i += 1) {
+        if (i === 0) {
+          list[0] = list[0].substr(5);
+        }
+
         var tmp;
         tmp = list[i].split('@');
 
@@ -190,10 +194,10 @@ module.exports = {
 
   fetchTvDb: function (req, res) {
     if (req.body.ids) {
-      var imdbId = req.body.ids.imdbId;
+      var title = req.body.title;
 
-      if (imdbId && imdbId.length > 0) {
-        var tbDbUrl = 'http://thetvdb.com/api/GetSeriesByRemoteID.php?imdbid=' + imdbId;
+      if (title && title.length > 0) {
+        var tbDbUrl = 'http://thetvdb.com/api/GetSeries.php?seriesname=' + title;
 
         request(tbDbUrl, function (error, response, body) {
           if (error) {
@@ -223,30 +227,12 @@ module.exports = {
   fetchTvRage: function (req, res) {
     if (req.body.ids) {
       var tvRageId = req.body.ids.tvrageId;
+      var showId = tvRageId || req.body.title;
 
-      if (tvRageId) {
-        getTvRageInfo(tvRageId, function (data) {
+      if (showId) {
+        getTvRageInfo(showId, function (data) {
           var code = (_.isEmpty(data)) ? (400) : (200);
           res.send(code, data);
-        });
-      } else if (req.body.title || req.body.alternateTitle) {
-        var title = req.body.alternateTitle || req.body.title;
-        TVRage.search(title, function (err, response) {
-          if (err) {
-            res.send(400, {});
-            log.error('fail');
-          } else {
-            var showId = response.Results.show[0].showid[0];
-
-            getTvRageInfo(showId, function (data) {
-              if (_.isEmpty(data)) {
-                res.send(400, data);
-              } else {
-                data.id = showId;
-                res.send(200, data);
-              }
-            });
-          }
         });
       } else {
         res.send(400, {});
@@ -256,5 +242,3 @@ module.exports = {
     }
   }
 };
-
-

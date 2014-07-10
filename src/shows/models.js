@@ -12,9 +12,9 @@ var ShowSchema = new Schema({
     trim: true
   },
   ids: {
-    tmdbId: { type: Number }, //todo tmdb
-    tvrageId: { type: Number }, //todo tvrage
-    imdbId: { type: String } //todo imdb
+    tmdb: { type: Number },
+    tvrage: { type: Number },
+    tvdb: { type: Number }
   },
   synopsis: {
     type: String,
