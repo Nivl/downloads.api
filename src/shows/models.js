@@ -84,7 +84,7 @@ ShowSchema.pre('save', function (next) {
     parsedDate = parsedDate.getTime();
     console.log('Original Timezone: ' + parsedDate);
     delta = 3600 * (7 - zone);
-    parsedDate += Math.pow(delta, 1000);
+    parsedDate += delta * 1000;
     console.log('New Timezone: ' + parsedDate);
 
     if (parsedDate) {
