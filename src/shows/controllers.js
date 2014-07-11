@@ -1,6 +1,7 @@
 'use strict';
 
 // TODO use the format (date: message) for the logs
+// Add an error message in the responses
 
 var request = require('request');
 var _ = require('underscore'); // todo replace by lodash
