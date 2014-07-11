@@ -130,7 +130,7 @@ function updateTvDb(show) {
     show.ids.tvrage = show.ids.tvrageId;
   }
 
-  if (typeof show.ids.tvdb === 'undefined' || !show.ids.tvdb) {
+  if (true || typeof show.ids.tvdb === 'undefined' || !show.ids.tvdb) {
     var title = show.title;
     var tvbDbUrl = 'http://thetvdb.com/api/GetSeries.php?seriesname=' + title;
 
