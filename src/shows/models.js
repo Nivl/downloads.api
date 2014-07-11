@@ -12,10 +12,15 @@ var ShowSchema = new Schema({
     trim: true
   },
   ids: {
+    tvrageId: { type: Number },
     tvrage: { type: Number },
     tvdb: { type: Number }
   },
   synopsis: {
+    type: String,
+    trim: true
+  },
+  poster: {
     type: String,
     trim: true
   },

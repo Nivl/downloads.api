@@ -123,6 +123,111 @@ schedule.scheduleJob('30 */2 * * *', function () {
   });
 });
 
+
+// TODO TMP
+function updateTvDb(show) {
+  if (typeof show.ids.tvrage === 'undefined' || !show.ids.tvrage) {
+    show.ids.tvrage = show.ids.tvrageId;
+  }
+
+  if (typeof show.ids.tvdb === 'undefined' || !show.ids.tvdb) {
+    var title = show.title;
+    var tvbDbUrl = 'http://thetvdb.com/api/GetSeries.php?seriesname=' + title;
+
+    request(tvbDbUrl, function (error, response, body) {
+      if (error) {
+        log.error('TVDB error:', error);
+      } else {
+        var parser = new xml2js.Parser({explicitArray: false});
+
+        parser.parseString(body, function (err, result) {
+          if (err) {
+            log.error('TVDB error:', err);
+          } else {
+            var data = result.Data.Series;
+
+            if (Array.isArray(data)) {
+              data = data[0];
+            }
+
+           if (typeof data !== 'undefined') {
+             show.ids.tvdb = data.seriesid;
+
+             getTPoster(show);
+             show.save();
+           }
+          }
+        });
+      }
+    });
+  }
+}
+
+function getTPoster(show) {
+
+  var url = 'http://thetvdb.com/data/series/' + show.ids.tvdb + '/';
+
+    request(url, function (error, response, body) {
+      if (error) {
+        log.error('TVDB error:', error);
+      } else {
+        var parser = new xml2js.Parser({explicitArray: false});
+
+        parser.parseString(body, function (err, result) {
+          if (err) {
+            log.error('TVDB error:', err);
+          } else {
+            var data = result.Data.Series;
+
+            if (typeof data !== 'undefined') {
+              show.poster = data.poster;
+              show.save();
+            }
+          }
+        });
+      }
+    });
+}
+
+// TODO TMP One
+schedule.scheduleJob('* * * * *', function () {
+  Show.find({}, function (err, shows) {
+    if (err) {
+      log.error('Cron failed:', err);
+    } else {
+      var nbShow = shows.length;
+
+      for (var i = 0; i < nbShow; i += 1) {
+        updateTvDb(shows[i]);
+      }
+    }
+  });
+});
+
+
+function getPoster(tvdbId, callback) {
+  var url = 'http://thetvdb.com/data/series/' + tvdbId + '/';
+
+  request(url, function (error, response, body) {
+    if (error) {
+      log.error('TVDB error:', error);
+      callback(error);
+    } else {
+      var parser = new xml2js.Parser({explicitArray: false});
+
+      parser.parseString(body, function (err, result) {
+        if (err) {
+          log.error('TVDB error:', err);
+          callback(err);
+        } else {
+          var data = result.Data.Series;
+          callback(null, data.poster);
+        }
+      });
+    }
+  });
+}
+
 module.exports = {
   getAll: function (req, res) {
     Show.find({}, function (err, shows) {
@@ -194,13 +299,41 @@ module.exports = {
   },
 
   fetchTvDb: function (req, res) {
+    var title = req.body.title;
+
+    if (title && title.length > 0) {
+      var tvbDbUrl = 'http://thetvdb.com/api/GetSeries.php?seriesname=' + title;
+
+      request(tvbDbUrl, function (error, response, body) {
+        if (error) {
+          log.error('TVDB error:', error);
+          res.send(400, {error: error});
+        } else {
+          var parser = new xml2js.Parser({explicitArray: false});
+
+          parser.parseString(body, function (err, result) {
+            if (err) {
+              log.error('TVDB error:', err);
+              res.send(400, {error: err});
+            } else {
+              res.send(200, result.Data.Series);
+            }
+          });
+        }
+      });
+    } else {
+      res.send(400, {error: 'invalid title'});
+    }
+  },
+
+  fetchPoster: function (req, res) {
     if (req.body.ids) {
-      var title = req.body.title;
+      var id = req.body.ids.tvdb;
 
-      if (title && title.length > 0) {
-        var tbDbUrl = 'http://thetvdb.com/api/GetSeries.php?seriesname=' + title;
+      if (id) {
+        var url = 'http://thetvdb.com/data/series/' + id + '/';
 
-        request(tbDbUrl, function (error, response, body) {
+        request(url, function (error, response, body) {
           if (error) {
             log.error('TVDB error:', error);
             res.send(400, {error: error});
@@ -212,7 +345,7 @@ module.exports = {
                 log.error('TVDB error:', err);
                 res.send(400, {error: err});
               } else {
-                res.send(200, result.Data.Series);
+                res.send(200, {'poster': result.Data.Series.poster});
               }
             });
           }
