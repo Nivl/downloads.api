@@ -203,14 +203,14 @@ module.exports = {
         request(tbDbUrl, function (error, response, body) {
           if (error) {
             log.error('TVDB error:', error);
-            res.send(400, {});
+            res.send(400, {error: error});
           } else {
             var parser = new xml2js.Parser({explicitArray: false});
 
             parser.parseString(body, function (err, result) {
               if (err) {
                 log.error('TVDB error:', err);
-                res.send(400, {});
+                res.send(400, {error: err});
               } else {
                 res.send(200, result.Data.Series);
               }
@@ -218,28 +218,23 @@ module.exports = {
           }
         });
       } else {
-        res.send(400, {});
+        res.send(400, {error: 'invalid id'});
       }
     } else {
-      res.send(400, {});
+      res.send(400, {error: 'invalid id'});
     }
   },
 
   fetchTvRage: function (req, res) {
-    if (req.body.ids) {
-      var tvRageId = req.body.ids.tvrageId;
-      var showId = tvRageId || req.body.title;
+    var title = req.body.title;
 
-      if (showId) {
-        getTvRageInfo(showId, function (data) {
-          var code = (_.isEmpty(data)) ? (400) : (200);
-          res.send(code, data);
-        });
-      } else {
-        res.send(400, {});
-      }
+    if (title) {
+      getTvRageInfo(title, function (data) {
+        var code = (_.isEmpty(data)) ? (400) : (200);
+        res.send(code, data);
+      });
     } else {
-      res.send(400, {});
+      res.send(400, {error: 'invalid title'});
     }
   }
 };
