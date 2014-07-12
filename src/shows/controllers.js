@@ -58,7 +58,7 @@ function getTvRageInfo(tvRageId, callback) {
 }
 
 function updateShowFromTvRage(show, callbackObj) {
-  getTvRageInfo(show.ids.tvrageId, function (data) {
+  getTvRageInfo(show.ids.tvrage, function (data) {
     if (_.isEmpty(data)) {
       callbackObj.done();
       log.error('Fail to retrieve ' + show.title + ':', 'Empty data');

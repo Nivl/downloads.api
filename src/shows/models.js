@@ -12,7 +12,6 @@ var ShowSchema = new Schema({
     trim: true
   },
   ids: {
-    tvrageId: { type: Number },
     tvrage: { type: Number },
     tvdb: { type: Number }
   },
