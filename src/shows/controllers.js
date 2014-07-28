@@ -84,12 +84,21 @@ function updateShowFromTvRage(show, callbackObj) {
         show.latestEpisode = {'title': data['Latest Episode'][1], date: data['Latest Episode'][2]};
       }
 
-      show.save(function (err) {
-        if (err) {
-          log.error('Fail to update ' + show.title + ':', err);
-        }
-        callbackObj.done();
-      });
+      if (show.day === null) { // invalid show, we remove it
+        show.remove(function (err) {
+          if (err) {
+            log.error('Fail to remove ' + show.title + ':', err);
+          }
+          callbackObj.done();
+        });
+      } else { // valid
+        show.save(function (err) {
+          if (err) {
+            log.error('Fail to update ' + show.title + ':', err);
+          }
+          callbackObj.done();
+        });
+      }
     }
   });
 }
