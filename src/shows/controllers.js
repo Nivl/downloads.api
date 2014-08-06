@@ -20,7 +20,7 @@ function findWeekIndex(name) {
 
 function getTvRageInfo(tvRageId, callback) {
   var type = (typeof tvRageId === 'string') ? 'show' : 'sid';
-  var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?' + type + '=' + tvRageId + '&exact=1';
+  var tvRageUrl = 'http://services.tvrage.com/tools/quickinfo.php?' + type + '=' + tvRageId;
 
   request(tvRageUrl, function(error, response, body) {
     var out = {};
