@@ -29,9 +29,9 @@ var ShowSchema = new Schema({
   },
   day: {
     type: Number,
-    default: 1,
+    default: 8,
     min: 1,
-    max: 7
+    max: 8
   },
   nextEpisode : {
     title: { type: String },

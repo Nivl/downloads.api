@@ -29,7 +29,6 @@ function getTvRageInfo(tvRageId, callback) {
       log.error('TV Rage error:', error);
     } else {
       var list = body.split('\n');
-      //list.splice(0, 1);
       var nbElement = list.length;
 
       for (var i = 0; i < nbElement; i += 1) {
@@ -76,6 +75,10 @@ function updateShowFromTvRage(show, callbackObj) {
         show.day = findWeekIndex(info[0]);
       }
 
+      if (show.day === null) {
+        show.day = 8;
+      }
+
       if (data['Next Episode'] && data['Next Episode'][2]) {
         show.nextEpisode = {'title': data['Next Episode'][1], date: data['Next Episode'][2]};
       }
@@ -84,21 +87,12 @@ function updateShowFromTvRage(show, callbackObj) {
         show.latestEpisode = {'title': data['Latest Episode'][1], date: data['Latest Episode'][2]};
       }
 
-      if (show.day === null) { // invalid show, we remove it
-        show.remove(function (err) {
-          if (err) {
-            log.error('Fail to remove ' + show.title + ':', err);
-          }
-          callbackObj.done();
-        });
-      } else { // valid
-        show.save(function (err) {
-          if (err) {
-            log.error('Fail to update ' + show.title + ':', err);
-          }
-          callbackObj.done();
-        });
-      }
+      show.save(function (err) {
+        if (err) {
+          log.error('Fail to update ' + show.title + ':', err);
+        }
+        callbackObj.done();
+      });
     }
   });
 }
