@@ -75,7 +75,7 @@ function updateShowFromTvRage(show, callbackObj, id) {
       } else {
         show.totalUpdateFailure += 1;
         show.save(function() { callbackObj.done(); });
-        log.error('Fail to retrieve ' + show.title + ':', 'Empty data');
+        log.error('[' + show.totalUpdateFailure + '] Fail to retrieve ' + show.title + ':', 'Empty data');
       }
     } else {
       show.totalUpdateFailure = 0;
