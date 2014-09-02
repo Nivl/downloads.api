@@ -70,19 +70,17 @@ function updateShowFromTvRage(show, callbackObj, id) {
     if (_.isEmpty(data)) {
       // todo this condition is here to fix an update. It should be useless in the future.
       if (show.totalUpdateFailure >= 5 && key === show.ids.tvrage) {
-        log.info('[' + show.totalUpdateFailure + '] force reload: ', show.title);
+        log.info('[' + show.ids.tvrage + '] Failled ' + show.totalUpdateFailure + ' times  force reload: ', show.title);
         updateShowFromTvRage(show, callbackObj, show.title);
       } else {
         show.totalUpdateFailure += 1;
         show.save(function() { callbackObj.done(); });
-        log.error('[' + show.totalUpdateFailure + '] Fail to retrieve ' + show.title + ':', 'Empty data');
+        log.error('[' + show.ids.tvrage + '] Fail ' + show.totalUpdateFailure + ' times to retrieve ' + show.title + ':', 'Empty data');
       }
     } else {
       show.totalUpdateFailure = 0;
 
-      if (show.ids.tvrage !== data['Show Id']) {
-        show.ids.tvrage = data['Show Id'];
-      }
+      show.ids.tvrage = parseInt(data['Show Id'], 10);
 
       if (data.Status) {
         if (data.Status === 'Ended') {
