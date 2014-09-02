@@ -59,9 +59,18 @@ function getTvRageInfo(tvRageId, callback) {
 function updateShowFromTvRage(show, callbackObj) {
   getTvRageInfo(show.ids.tvrage, function (data) {
     if (_.isEmpty(data)) {
-      callbackObj.done();
+      // todo try with name instead of the id
+
+      show.totalUpdateFailure += 1;
+
+      show.save(function() {
+        callbackObj.done();
+      });
+
       log.error('Fail to retrieve ' + show.title + ':', 'Empty data');
     } else {
+      show.totalUpdateFailure = 0;
+
       if (data.Status) {
         if (data.Status === 'Ended') {
           show.isCompleted = true;

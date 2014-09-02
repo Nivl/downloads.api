@@ -48,6 +48,10 @@ var ShowSchema = new Schema({
   isCancelled: { //todo hasBeenCanceled
     type: Boolean,
     default: false
+  },
+  totalUpdateFailure: {
+    type: Number,
+    default: 0
   }
 });
 
