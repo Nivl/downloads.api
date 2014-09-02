@@ -90,10 +90,14 @@ function updateShowFromTvRage(show, callbackObj) {
 
       if (data['Next Episode'] && data['Next Episode'][2]) {
         show.nextEpisode = {'title': data['Next Episode'][1], date: data['Next Episode'][2]};
+      } else {
+        show.nextEpisode = null;
       }
 
       if (data['Latest Episode'] && data['Latest Episode'][2]) {
         show.latestEpisode = {'title': data['Latest Episode'][1], date: data['Latest Episode'][2]};
+      } else {
+        show.latestEpisode = null;
       }
 
       show.save(function (err) {
