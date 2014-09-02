@@ -68,6 +68,7 @@ function updateShowFromTvRage(show, callbackObj, id) {
 
   getTvRageInfo(key, function (data) {
     if (_.isEmpty(data)) {
+      // todo this condition is here to fix an update. It should be useless in the future.
       if (show.totalUpdateFailure >= 5 && key === show.ids.tvrage) {
         updateShowFromTvRage(show, callbackObj, show.title);
       } else {
