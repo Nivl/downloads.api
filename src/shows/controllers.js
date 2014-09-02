@@ -56,6 +56,20 @@ function getTvRageInfo(tvRageId, callback) {
   });
 }
 
+function tvRageEmptyData(show, key, callbackObj) {
+  if (show.totalUpdateFailure >= 5 && key === show.ids.tvrage) { // Called when a show has no tvRage ID
+    log.info('[' + show.ids.tvrage + '] Failled ' + show.totalUpdateFailure + ' times  force reload: ', show.title);
+    updateShowFromTvRage(show, callbackObj, show.title);
+  } else {
+    show.totalUpdateFailure += 1;
+
+    show.save(function() {
+      callbackObj.done();
+    });
+    log.error('[' + show.ids.tvrage + '] Fail ' + show.totalUpdateFailure + ' times to retrieve ' + show.title + ':', 'Empty data');
+  }
+}
+
 /**
  * Update a show
  *
@@ -68,15 +82,7 @@ function updateShowFromTvRage(show, callbackObj, id) {
 
   getTvRageInfo(key, function (data) {
     if (_.isEmpty(data)) {
-      // todo this condition is here to fix an update. It should be useless in the future.
-      if (show.totalUpdateFailure >= 5 && key === show.ids.tvrage) {
-        log.info('[' + show.ids.tvrage + '] Failled ' + show.totalUpdateFailure + ' times  force reload: ', show.title);
-        updateShowFromTvRage(show, callbackObj, show.title);
-      } else {
-        show.totalUpdateFailure += 1;
-        show.save(function() { callbackObj.done(); });
-        log.error('[' + show.ids.tvrage + '] Fail ' + show.totalUpdateFailure + ' times to retrieve ' + show.title + ':', 'Empty data');
-      }
+      tvRageEmptyData(show, key, callbackObj);
     } else {
       show.totalUpdateFailure = 0;
 
