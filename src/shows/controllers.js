@@ -56,20 +56,31 @@ function getTvRageInfo(tvRageId, callback) {
   });
 }
 
-function updateShowFromTvRage(show, callbackObj) {
-  getTvRageInfo(show.ids.tvrage, function (data) {
+/**
+ * Update a show
+ *
+ * show : show to update
+ * callBackObj: Object to callback
+ * id: Optional: data to fetch (int for ID, string fot a title). Use ids.tvrage if not provided
+ */
+function updateShowFromTvRage(show, callbackObj, id) {
+  var key = (typeof id === 'undefined') ? (show.ids.tvrage) : (id);
+
+  getTvRageInfo(key, function (data) {
     if (_.isEmpty(data)) {
-      // todo try with name instead of the id
-
-      show.totalUpdateFailure += 1;
-
-      show.save(function() {
-        callbackObj.done();
-      });
-
-      log.error('Fail to retrieve ' + show.title + ':', 'Empty data');
+      if (show.totalUpdateFailure >= 5 && key === show.ids.tvrage) {
+        updateShowFromTvRage(show, callbackObj, show.title);
+      } else {
+        show.totalUpdateFailure += 1;
+        show.save(function() { callbackObj.done(); });
+        log.error('Fail to retrieve ' + show.title + ':', 'Empty data');
+      }
     } else {
       show.totalUpdateFailure = 0;
+
+      if (show.ids.tvrage !== data['Show Id']) {
+        show.ids.tvrage = data['Show Id'];
+      }
 
       if (data.Status) {
         if (data.Status === 'Ended') {
