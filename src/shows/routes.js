@@ -22,4 +22,6 @@ router.post(baseUrl + 'fetch/tvdb/', controllers.fetchTvDb);
 router.post(baseUrl + 'fetch/tvrage/', controllers.fetchTvRage);
 router.post(baseUrl + 'fetch/poster/', controllers.fetchPoster);
 
+router.get(baseUrl + 'reload/all/', controllers.reloadAll);
+
 module.exports = router;

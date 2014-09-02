@@ -70,6 +70,7 @@ function updateShowFromTvRage(show, callbackObj, id) {
     if (_.isEmpty(data)) {
       // todo this condition is here to fix an update. It should be useless in the future.
       if (show.totalUpdateFailure >= 5 && key === show.ids.tvrage) {
+        log.info('[' + show.totalUpdateFailure + '] force reload: ', show.title);
         updateShowFromTvRage(show, callbackObj, show.title);
       } else {
         show.totalUpdateFailure += 1;
@@ -122,7 +123,7 @@ function updateShowFromTvRage(show, callbackObj, id) {
   });
 }
 
-schedule.scheduleJob('30 */2 * * *', function () {
+function reloadAllShows() {
   var id = uuid.v4();
   io.emitAllAndNew('maintenance', true, id);
 
@@ -149,7 +150,10 @@ schedule.scheduleJob('30 */2 * * *', function () {
       }
     }
   });
-});
+}
+
+
+schedule.scheduleJob('30 */2 * * *', reloadAllShows);
 
 module.exports = {
   getAll: function (req, res) {
@@ -292,5 +296,10 @@ module.exports = {
     } else {
       res.send(400, {error: 'invalid title'});
     }
+  },
+
+  reloadAll: function (req, res) {
+    reloadAllShows();
+    res.send(200);
   }
 };
