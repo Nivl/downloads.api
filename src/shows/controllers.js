@@ -80,7 +80,7 @@ function updateShowFromTvRage(show, callbackObj, id) {
     } else {
       show.totalUpdateFailure = 0;
 
-      show.ids.tvrage = parseInt(data['Show Id'], 10);
+      show.ids.tvrage = parseInt(data['Show ID'], 10);
 
       if (data.Status) {
         if (data.Status === 'Ended') {
